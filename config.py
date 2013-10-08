@@ -9,8 +9,8 @@ DEFAULT_MASTHEAD = "mh_default.gif" #如果书籍没有报头，则使用此报�
 DEFAULT_COVER = "cv_default.jpg" #如果书籍没有封面，则使用此封面，留空则不添加封面
 
 #自定义RSS的默认标题，后续可以在网页上修改，如果包含中文则需要在前面加u''
-MY_FEEDS_TITLE = u'KindleEar'
-MY_FEEDS_DESC = u'RSS delivering from KindleEar'
+MY_FEEDS_TITLE = u'Rss2Kindle'
+MY_FEEDS_DESC = u'RSS delivering from Rss2Kindle'
 
 #设置下载RSS和文章的超时时间，单位为秒，如果RSS很多，设置短一点有可能提高一些效率
 #但是也增加了下载超时的可能，超时则丢失超时的RSS或文章或图片，不会有更多的影响
