@@ -1,4 +1,3 @@
-﻿Readme of english version refers to Readme_EN.txt
 
 Rss2Kindle源自KindleEar project。https://github.com/cdhigh/KindleEar
 
