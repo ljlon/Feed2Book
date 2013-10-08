@@ -14,7 +14,7 @@ log = logging.getLogger()
 __builtin__.__dict__['default_log'] = log
 __builtin__.__dict__['IsRunInLocal'] = IsRunInLocal
 
-supported_languages = ['en','zh-cn','tr-tr'] #不支持的语种则使用第一个语言
+supported_languages = ['en','zh-cn'] #不支持的语种则使用第一个语言
 #gettext.install('lang', 'i18n', unicode=True) #for calibre startup
 
 import web
@@ -209,13 +209,13 @@ class BaseHandler:
         
 class Home(BaseHandler):
     def GET(self):
-        return self.render('home.html',"Home")
-        
-class Setting(BaseHandler):
+        return self.render('home.html',"Home", books=Book.all().filter("builtin = ",True))
+   
+class PushSetting(BaseHandler):
     def GET(self, tips=None):
         user = self.getcurrentuser()
-        return self.render('setting.html',"Setting",
-            current='setting',user=user,mail_sender=SRC_EMAIL,tips=tips)
+        return self.render('pushsetting.html',"Push Setting",
+            current='pushsetting',user=user,mail_sender=SRC_EMAIL,tips=tips)
         
     def POST(self):
         user = self.getcurrentuser()
@@ -243,7 +243,7 @@ class Setting(BaseHandler):
             myfeeds.oldest_article = int(web.input().get('oldest', 7))
             myfeeds.users = [user.name] if web.input().get("enablerss") else []
             myfeeds.put()
-            tips = _("Settings Saved!")
+            tips = _("Push Settings Saved!")
         
         return self.GET(tips)
 
@@ -843,7 +843,7 @@ urls = (
   "/subscribe/(.*)", "Subscribe",
   "/unsubscribe/(.*)", "Unsubscribe",
   "/delfeed/(.*)", "DelFeed",
-  "/setting", "Setting",
+  "/pushsetting", "PushSetting",
   '/advsetting', 'AdvSetting',
   "/admin","Admin",
   "/deliver", "Deliver",

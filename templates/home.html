@@ -1,18 +1,23 @@
-{% extends "base.html" %}
-{% block css %}
-<style type="text/css">
-p{
-    color:#2d2d2d;
-    text-align:left;
-}
-li{
-    list-style:circle;
-    color:#2d2d2d;
-}
-</style>
-{% endblock %}
+{% extends "base-home.html" %}
 {% block content %}
-    <p>{{_("包含图片的全文RSS推送服务，支持Kindle、多看等电子阅读器设备。")}}
-        <a href="/static/periodical.gif" target="_blank" style="text-decoration:none;"> {{_("示例图片")}} </a>
-    </p>
+{% set hasitem2 = [] %}
+{% for book in books %}
+<div class="book">
+    <div class="titleRow">{{book.title}}</div>
+    <div class="cornerControls">
+        {% if nickname not in book.users %}
+        <a href="/subscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribe")}}</a>
+        {% else %}
+        <a href="/unsubscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribed")}}</a>
+        {% endif %}
+    </div>
+    <div class="summaryRow">
+        {%if book.description|length>80%}{{book.description[:80]}}...<span>{{book.description}}</span>{%else%}{{book.description}}{%endif%}
+    </div>
+</div>
+{% do hasitem2.append(1) %}
+{% endfor %}
+{% if not hasitem2 %}
+<p style="font-size:0.8em;color:grey;">{{_("No have book unsubscrebed")}}</p>
+{% endif %}
 {% endblock %}

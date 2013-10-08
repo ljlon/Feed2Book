@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>{{title}} - Kindle's Ear</title>
+    <title>{{title}} - Rss2Kindle</title>
     <meta name="description" content="Rss2Kindle is a service for Amazon Kindle owners that lets you aggregate feeds you chosen and have them delivered to your Kindle in a convenient, easy-to-navigate format." />
     <link rel="stylesheet" href="/static/base.css" type="text/css" charset="utf-8"/>
     {% block cssfiles %}{% endblock %}
@@ -19,48 +19,15 @@
         {% if nickname %}
           <a class="nav" href="/logout">{{_("Logout")}}</a>
           <span style="color: #ccc;">&bull;</span>
-        <span>Hello, <a href="/admin"><strong>{{nickname}}</strong></a></span>
+          <span>Hello,{{nickname}}.&nbsp;<a href="/pushsetting"><strong>{{_("Setting")}}</strong></a></span>
+        {% else %}
+          <span><a href="/login">{{_("Please Login")}}</a></span>
         {% endif %}
         <div class="clear"></div>
         {% endblock %}
     </div>
     <div id="menubar">
     {% block menubar %}
-    {% if nickname %}
-        <h2 id="categoryHeader"> 
-        {% if current == "my" %}
-        {{_("Feeds")}}
-        {% else %}
-        <a href="/my">{{_("Feeds")}}</a>
-        {% endif %}
-        <span style="color: #ccc;">&bull;</span>
-        {% if current == "setting" %}
-        {{_("Setting")}}
-        {% else %}
-        <a href="/setting">{{_("Setting")}}</a>
-        {% endif %}
-        <span style="color: #ccc;">&bull;</span>
-        {% if current == "logs" %}
-        {{_("Logs")}}
-        {% else %}
-        <a href="/logs">{{_("Logs")}}</a>
-        {% endif %}
-        <span style="color: #ccc;">&bull;</span>
-        {% if current == "admin" %}
-        {{_("Admin")}}
-        {% else %}
-        <a href="/admin">{{_("Admin")}}</a>
-        {% endif %}
-        <span style="color: #ccc;">&bull;</span>
-        {% if current == "advsetting" %}
-        {{_("Advance")}}
-        {% else %}
-        <a href="/advsetting">{{_("Advance")}}</a>
-        {% endif %}
-        </h2>
-    {% else %}
-        <h2 style="text-align:left;padding:10px 0;"><a href="/login">{{_("Please Login")}}</a></h2>
-    {% endif %}
     {% endblock %}
     </div>
     <div id="content">

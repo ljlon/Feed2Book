@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base-home.html" %}
 {% block content %}
 <fieldset id="mybooks">
     <legend>{{_("Subscribed")}}</legend>
@@ -59,26 +59,4 @@
     </form>
 </fieldset>
 {% endif %}
-<p></p>
-<fieldset id="books">
-    <legend>{{_("Unsubscribed")}}</legend>
-    {% set hasitem2 = [] %}
-    {% for book in books %}
-    {% if nickname not in book.users %}
-    <div class="book">
-        <div class="titleRow">{{book.title}}</div>
-        <div class="cornerControls">
-            <a href="/subscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribe")}}</a>
-        </div>
-        <div class="summaryRow">
-            {%if book.description|length>80%}{{book.description[:80]}}...<span>{{book.description}}</span>{%else%}{{book.description}}{%endif%}
-        </div>
-    </div>
-    {% do hasitem2.append(1) %}
-    {% endif %}
-    {% endfor %}
-    {% if not hasitem2 %}
-    <p style="font-size:0.8em;color:grey;">{{_("No have book unsubscrebed")}}</p>
-    {% endif %}
-</fieldset>
 {% endblock %}
