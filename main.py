@@ -511,6 +511,23 @@ class Subscribe(BaseHandler):
             bk.users.append(session.username)
             bk.put()
         raise web.seeother('/my')
+    def POST(self, id):
+        self.login_required()
+        if not id:
+            return "the id is empty!<br />"
+        try:
+            id = int(id)
+        except:
+            return "the id is invalid!<br />"
+        
+        bk = Book.get_by_id(id)
+        if not bk:
+            return "the book(%d) not exist!<br />" % id
+        
+        if session.username not in bk.users:
+            bk.users.append(session.username)
+            bk.put()
+        return "ok"
         
 class Unsubscribe(BaseHandler):
     def GET(self, id):
@@ -530,7 +547,23 @@ class Unsubscribe(BaseHandler):
             bk.users.remove(session.username)
             bk.put()
         raise web.seeother('/my')
-
+    def POST(self, id):
+        self.login_required()
+        if not id:
+            return "the id is empty!<br />"
+        try:
+            id = int(id)
+        except:
+            return "the id is invalid!<br />"
+            
+        bk = Book.get_by_id(id)
+        if not bk:
+            return "the book(%d) not exist!<br />" % id
+        
+        if session.username in bk.users:
+            bk.users.remove(session.username)
+            bk.put()
+        return "ok"
 class DelFeed(BaseHandler):
     def GET(self, id):
         user = self.getcurrentuser()
