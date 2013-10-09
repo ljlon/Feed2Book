@@ -38,6 +38,7 @@ class ZhihuDaily(BaseFeedBook):
     remove_classes = ['view-more', 'avatar']
     remove_attrs = []
     extra_css = """
+        h1{font-weight:bold;font-size:1.3em}h2{font-size:1.2em}h3{font-size:1.1em}
         .question-title {font-size:1.1em;font-weight:normal;text-decoration:underline;color:#606060;}
         .meta {font-size:0.9em;color:#808080;}
     """
