@@ -2,8 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>{{title}} - Rss2Kindle</title>
-    <meta name="description" content="Rss2Kindle is a service for Amazon Kindle owners that lets you aggregate feeds you chosen and have them delivered to your Kindle in a convenient, easy-to-navigate format." />
+    <title>{{title}} - Feed2Book</title>
+    <meta name="description" content="Feed2Book is a service for Amazon Kindle owners that lets you aggregate feeds you chosen and have them delivered to your Kindle in a convenient, easy-to-navigate format." />
     <link rel="stylesheet" href="/static/base.css" type="text/css" charset="utf-8" />
     <script src="/static/jquery.js" type="text/javascript" ></script>
     <script type="text/javascript">
@@ -18,17 +18,20 @@
 {% endblock %}
     <div id="header">
         {% block header %}
-        <h1><a href="/">Rss2Kindle<sup>&#9728;</sup></a></h1>
-        {% if nickname %}
-          <a class="nav" href="/logout">{{_("Logout")}}</a>
-          <span style="color: #ccc;">&bull;</span>
-          <span>Hello,{{nickname}}.&nbsp;<a href="/pushsetting"><strong>{{_("Setting")}}</strong></a></span>
-        {% else %}
-          <span><a href="/login">{{_("Please Login")}}</a></span>
-        {% endif %}
+        <h1><a href="/">Feed2Book<sup>&#9728;</sup></a></h1>
+        <div class="userNav">
+            {% if nickname %}
+              <a class="nav" href="/logout">{{_("Logout")}}</a>
+              <span style="color: #ccc;">&bull;</span>
+              <span>Hello,{{nickname}}.&nbsp;<a href="/admin"><strong>{{_("Setting")}}</strong></a></span>
+            {% else %}
+              <span><a href="/login">{{_("Login")}}</a></span>
+            {% endif %}
+        </div>
         <div class="clear"></div>
         {% endblock %}
     </div>
+
     <div id="menubar">
     {% block menubar %}
     {% endblock %}
@@ -40,8 +43,8 @@
     <div id="footer">
         {% block footer %}
         <div class="clear"></div>
-        2013 &copy; Rss2Kindle&nbsp;&nbsp;|&nbsp;&nbsp;
-        <a href="https://github.com/ljlon/Rss2Kindle" target="_blank" style="text-decoration:none;">Github page</a>
+        2013 &copy; Feed2Book&nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="https://github.com/ljlon/Feed2Book" target="_blank" style="text-decoration:none;">Github page</a>
         {% endblock %}
     </div>
 </body>

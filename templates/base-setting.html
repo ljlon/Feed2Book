@@ -2,22 +2,16 @@
 {% block menubar %}
 {% if nickname %}
     <h2 id="categoryHeader"> 
-    {% if current == "pushsetting" %}
-    {{_("Push Setting")}}
+    {% if current == "admin" %}
+    {{_("Admin")}}
     {% else %}
-    <a href="/pushsetting">{{_("Push Setting")}}</a>
+    <a href="/admin">{{_("Admin")}}</a>
     {% endif %}
     <span style="color: #ccc;">&bull;</span>
     {% if current == "logs" %}
     {{_("Logs")}}
     {% else %}
     <a href="/logs">{{_("Logs")}}</a>
-    {% endif %}
-    <span style="color: #ccc;">&bull;</span>
-    {% if current == "admin" %}
-    {{_("Admin")}}
-    {% else %}
-    <a href="/admin">{{_("Admin")}}</a>
     {% endif %}
     <span style="color: #ccc;">&bull;</span>
     {% if current == "advsetting" %}

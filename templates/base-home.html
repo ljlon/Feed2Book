@@ -9,6 +9,12 @@
     {% else %}
     <a href="/my">{{_("Feeds")}}</a>
     {% endif %}
+    <span style="color: #ccc;">&bull;</span>
+    {% if current == "pushsetting" %}
+    {{_("Push Setting")}}
+    {% else %}
+    <a href="/pushsetting">{{_("Push Setting")}}</a>
+    {% endif %}
     </h2>
 {% endif %}
 {% endblock %}

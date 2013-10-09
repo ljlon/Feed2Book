@@ -5,7 +5,9 @@
 <div id="book{{book.key().id()}}" class="book">
     <div class="titleRow">{{book.title}}</div>
     <div class="cornerControls">
-        {% if nickname not in book.users %}
+        {% if not nickname %}
+        <a href="#" class="needLogin actionButton">{{_("Subscribe")}}</a>
+        {% elif nickname not in book.users %}
         <a href="/subscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribe")}}</a>
         {% else %}
         <a href="/unsubscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribed")}}</a>
@@ -43,7 +45,12 @@
             return false;
         }
         $(document).ready(function(){
-          $(".actionButton").click(function(){
+            $(".actionButton").click(function(){
+                if ($(this).hasClass("needLogin")){
+                    alert("{{_("Please Login")}}");
+                    return false;
+                }
+
                 var obj = $(this);
                 var href = $(this).attr('href');
                 var url_parsed=new Array(); 
