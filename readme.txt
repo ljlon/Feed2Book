@@ -1,5 +1,5 @@
-
-Rss2Kindle源自KindleEar project。https://github.com/cdhigh/KindleEar
+﻿
+Feed2Book源自KindleEar project。https://github.com/cdhigh/KindleEar
 
 一、这是一个运行在Google App Engine(GAE)上的Kindle个人推送服务器，生成排版精美的杂志模式MOBI格式自动每天推送至您的kindle，
     此网站应用目前的功能有：
@@ -17,13 +17,13 @@ Rss2Kindle源自KindleEar project。https://github.com/cdhigh/KindleEar
     2.下载GAE SDK。https://developers.google.com/appengine/downloads?hl=zh-CN
     3.安装Python 2.7 如果已经安装了，跳过此步骤
     4.下载本应用的所有文件，放到一个特定的目录。
-    5.修改app.yaml的第一行：将rss2kindle修改为你申请的application名字
+    5.修改app.yaml的第一行：将feed2book修改为你申请的application名字
     6.修改config.py中的这几个变量
       SRC_EMAIL ：你申请GAE账号时的GMAIL邮箱
       TIMEZONE ：默认时区
     7.转到GAE SDK安装目录（默认为：C:\Program Files\Google\google_appengine）
-      执行CMD命令：c:\python27\python.exe appcfg.py update Rss2Kindle目录
-      比如：c:\python27\python.exe appcfg.py update c:\Rss2Kindle
+      执行CMD命令：c:\python27\python.exe appcfg.py update Feed2Book目录
+      比如：c:\python27\python.exe appcfg.py update c:\Feed2Book
       依次输入邮箱和密码，等结束后就可以打开域名：
       app_name.appspot.com (app_name是你申请的application名字)
       开始您的个人推送服务了。
@@ -32,4 +32,4 @@ Rss2Kindle源自KindleEar project。https://github.com/cdhigh/KindleEar
 
 三、许可
 
-Rss2Kindle is Licensed under the GPL license: http://www.gnu.org/licenses/gpl.html
+Feed2Book is Licensed under the GPL license: http://www.gnu.org/licenses/gpl.html
