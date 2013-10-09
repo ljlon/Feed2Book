@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block menubar %}
+{% if nickname %}
+    <h2 id="categoryHeader"> 
+    {% if current == "pushsetting" %}
+    {{_("Push Setting")}}
+    {% else %}
+    <a href="/pushsetting">{{_("Push Setting")}}</a>
+    {% endif %}
+    <span style="color: #ccc;">&bull;</span>
+    {% if current == "logs" %}
+    {{_("Logs")}}
+    {% else %}
+    <a href="/logs">{{_("Logs")}}</a>
+    {% endif %}
+    <span style="color: #ccc;">&bull;</span>
+    {% if current == "admin" %}
+    {{_("Admin")}}
+    {% else %}
+    <a href="/admin">{{_("Admin")}}</a>
+    {% endif %}
+    <span style="color: #ccc;">&bull;</span>
+    {% if current == "advsetting" %}
+    {{_("Advance")}}
+    {% else %}
+    <a href="/advsetting">{{_("Advance")}}</a>
+    {% endif %}
+    </h2>
+{% else %}
+    <h2 style="text-align:left;padding:10px 0;"><a href="/login">{{_("Please Login")}}</a></h2>
+{% endif %}
+{% endblock %}
