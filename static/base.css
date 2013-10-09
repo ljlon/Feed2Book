@@ -202,7 +202,7 @@ fieldset {
 -webkit-border-radius: 8px;
 -moz-border-radius: 8px;
 border-radius: 8px;
-padding: 3px 3px 3px 3px;
+padding: 5px 5px 5px 5px;
 }
 legend {
   padding: 0.2em 0.5em;
@@ -239,10 +239,11 @@ legend {
 
 .book {
     border:1px solid #ccc;
-    -webkit-border-radius: 9px;
-    -moz-border-radius: 9px;
-    border-radius: 9px;
+    //-webkit-border-radius: 9px;
+    //-moz-border-radius: 9px;
+    //border-radius: 9px;
     padding: 3px 3px 3px 3px;
+    margin:5px 0 5px 0;
 }
 .titleRow {
     font-size:1.1em;
