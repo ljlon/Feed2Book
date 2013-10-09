@@ -178,7 +178,7 @@ class BaseFeedBook:
     # 添加到每篇文章的CSS，可以更完美的控制文章呈现
     # 仅需要CSS内容，不要包括<style type="text/css"></style>标签
     # 可以使用多行字符串
-    extra_css = ''
+    extra_css = 'h1{font-weight:bold;font-size:1.3em}'
     
     # 一个字符串列表，为正则表达式，在此列表中的url不会被下载
     # 可用于一些注定无法下载的图片链接，以便节省时间
@@ -265,7 +265,6 @@ class BaseFeedBook:
 <title>%s</title>
 <style type="text/css">
     p{text-indent:2em;}
-    h1{font-weight:bold;}
 </style>
 </head><body>
 %s

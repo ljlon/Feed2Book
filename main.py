@@ -706,7 +706,7 @@ class Worker(BaseHandler):
         oeb = CreateOeb(log, None, opts)
         title = "%s %s" % (book.title, local_time(titlefmt, tz)) if titlefmt else book.title
         
-        setMetaData(oeb, title, book.language, local_time(tz=tz), 'KindleEar')
+        setMetaData(oeb, title, book.language, local_time(tz=tz), 'Feed2Book')
         oeb.container = ServerContainer(log)
         
         #guide
