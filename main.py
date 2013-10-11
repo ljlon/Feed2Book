@@ -77,7 +77,7 @@ class Book(db.Model):
     def owner(self):
         return KeUser.all().filter('ownfeeds = ', self.key())
     
-class KeUser(db.Model): # kindleEar User
+class KeUser(db.Model): # Feed2Book User
     name = db.StringProperty(required=True)
     passwd = db.StringProperty(required=True)
     kindle_email = db.StringProperty()
@@ -190,7 +190,7 @@ class BaseHandler:
         else:
             filename = "%s.%s"%(basename,booktype)
         try:
-            mail.send_mail(SRC_EMAIL, to, "KindleEar %s" % lctime, "Deliver from KindlerEar",
+            mail.send_mail(SRC_EMAIL, to, "Feed2Book %s" % lctime, "Deliver from Feed2Book",
                 attachments=[(filename, attachment),])
         except OverQuotaError as e:
             default_log.warn('overquota when sendmail to %s:%s' % (to, str(e)))
@@ -201,7 +201,7 @@ class BaseHandler:
         else:
             self.deliverlog(name, to, title, len(attachment), tz=tz)
     
-    def render(self, templatefile, title='KindleEar', **kwargs):
+    def render(self, templatefile, title='Feed2Book', **kwargs):
         kwargs.setdefault('nickname', session.get('username'))
         kwargs.setdefault('lang', session.get('lang', 'en'))
         kwargs.setdefault('version', __Version__)
