@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import re
 from base import BaseFeedBook
@@ -15,6 +16,9 @@ class Huxiu(BaseFeedBook):
     network_timeout       = 30
     fetch_img_via_ssl     = False
     feeds = [
-            (u'虎嗅', 'http://www.huxiu.com/rss/0.xml'),
+            (u'全站', 'http://www.huxiu.com/rss/0.xml'),
+            (u'看点', 'http://www.huxiu.com/rss/1.xml'),
+            (u'读点', 'http://www.huxiu.com/rss/6.xml'),
+            (u'观点', 'http://www.huxiu.com/rss/4.xml'),
            ]
            
