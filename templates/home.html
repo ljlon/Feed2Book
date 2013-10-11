@@ -1,80 +1,82 @@
 {% extends "base-home.html" %}
 {% block content %}
-{% set hasitem2 = [] %}
-{% for book in books %}
-<div id="book{{book.key().id()}}" class="book">
-    <div class="titleRow">{{book.title}}</div>
-    <div class="cornerControls">
-        {% if not nickname %}
-        <a href="#" class="needLogin actionButton">{{_("Subscribe")}}</a>
-        {% elif nickname not in book.users %}
-        <a href="/subscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribe")}}</a>
-        {% else %}
-        <a href="/unsubscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribed")}}</a>
-        {% endif %}
+<div class="col-md-9">
+    {% set hasitem2 = [] %}
+    {% for book in books %}
+    <div id="book{{book.key().id()}}" class="book">
+        <div class="titleRow">{{book.title}}</div>
+        <div class="cornerControls">
+            {% if not nickname %}
+            <a href="#" class="needLogin actionButton">{{_("Subscribe")}}</a>
+            {% elif nickname not in book.users %}
+            <a href="/subscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribe")}}</a>
+            {% else %}
+            <a href="/unsubscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribed")}}</a>
+            {% endif %}
+        </div>
+        <div class="summaryRow">
+            {%if book.description|length>80%}{{book.description[:80]}}...<span>{{book.description}}</span>{%else%}{{book.description}}{%endif%}
+        </div>
     </div>
-    <div class="summaryRow">
-        {%if book.description|length>80%}{{book.description[:80]}}...<span>{{book.description}}</span>{%else%}{{book.description}}{%endif%}
-    </div>
-</div>
-{% do hasitem2.append(1) %}
-{% endfor %}
-{% if not hasitem2 %}
-<p style="font-size:0.8em;color:grey;">{{_("No have book unsubscrebed")}}</p>
-{% endif %}
-<script type="text/javascript">
-        function ajax_request(obj, msg, callback)
-        {
-            var href = $(obj).attr('href');
-            if (href == '' || href =='#')
-                return false
-            $(obj).attr('href', '###');
-            $.post(href, {},
-                function(data){
-                    if(data == 'ok') {
-                        if (callback){
-                            callback(obj)
+    {% do hasitem2.append(1) %}
+    {% endfor %}
+    {% if not hasitem2 %}
+    <p style="font-size:0.8em;color:grey;">{{_("No have book unsubscrebed")}}</p>
+    {% endif %}
+    <script type="text/javascript">
+            function ajax_request(obj, msg, callback)
+            {
+                var href = $(obj).attr('href');
+                if (href == '' || href =='#')
+                    return false
+                $(obj).attr('href', '###');
+                $.post(href, {},
+                    function(data){
+                        if(data == 'ok') {
+                            if (callback){
+                                callback(obj)
+                            }
+                            else if (msg){
+                                alert(msg);
+                            }
+                            return false;
                         }
-                        else if (msg){
-                            alert(msg);
-                        }
+                    }
+                );
+                return false;
+            }
+            $(document).ready(function(){
+                $(".actionButton").click(function(){
+                    if ($(this).hasClass("needLogin")){
+                        alert("{{_("Please Login")}}");
                         return false;
                     }
-                }
-            );
-            return false;
-        }
-        $(document).ready(function(){
-            $(".actionButton").click(function(){
-                if ($(this).hasClass("needLogin")){
-                    alert("{{_("Please Login")}}");
+
+                    var obj = $(this);
+                    var href = $(this).attr('href');
+                    var url_parsed=new Array(); 
+                    url_parsed=href.split("/");
+                    var action = url_parsed[1];
+                    var id = url_parsed[2];
+
+                    if (action == "unsubscribe") {                
+                        ajax_request($(this), null, function(obj){
+                            $(obj).html("{{_("Subscribe")}}");
+                            href = '/subscribe/' + id;
+                            $(obj).attr('href', href);
+                        });
+                    }
+                    else {
+                         ajax_request($(this), null, function(obj){
+                            $(obj).html("{{_("Subscribed")}}");
+                            href = '/unsubscribe/' + id;
+                            $(obj).attr('href', href);
+                        });
+                    }
+
                     return false;
-                }
-
-                var obj = $(this);
-                var href = $(this).attr('href');
-                var url_parsed=new Array(); 
-                url_parsed=href.split("/");
-                var action = url_parsed[1];
-                var id = url_parsed[2];
-
-                if (action == "unsubscribe") {                
-                    ajax_request($(this), null, function(obj){
-                        $(obj).html("{{_("Subscribe")}}");
-                        href = '/subscribe/' + id;
-                        $(obj).attr('href', href);
-                    });
-                }
-                else {
-                     ajax_request($(this), null, function(obj){
-                        $(obj).html("{{_("Subscribed")}}");
-                        href = '/unsubscribe/' + id;
-                        $(obj).attr('href', href);
-                    });
-                }
-
-                return false;
+                });
             });
-        });
-</script>
+    </script>
+</div>
 {% endblock %}

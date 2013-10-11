@@ -23,7 +23,7 @@
         {% block header %}
         <div class="container">
             <div class="navbar-header">
-                 <a class="navbar-brand" href="/">Feed2Book</a>
+                 <a class="navbar-brand " href="/">Feed2Book</a>
             </div>
             <nav class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
@@ -34,13 +34,6 @@
                         <li>
                         {% endif %}
                             <a href="/my">{{_("Feeds")}}</a>
-                        </li>
-                        {% if current == "pushsetting" %}
-                        <li class="active">
-                        {% else %}
-                        <li>
-                        {% endif %}
-                            <a href="/pushsetting">{{_("Push")}}</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -60,10 +53,10 @@
 
     <div class="container theme-showcase">
         <div class="row">
-            {% block menubar %}
+            {% block content %}
             {% endblock %}
 
-            {% block content %}
+            {% block menubar %}
             {% endblock %}
         </div>
 

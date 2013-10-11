@@ -2,6 +2,11 @@
 {% block menubar %}
 <div class="col-md-3">
     <div class="list-group">
+    	{% if current == "my" %}
+        <a class="list-group-item active" href="/my">{{_("Feeds")}}</a>
+        {% else %}
+            <a class="list-group-item" href="/my">{{_("Feeds")}}</a>
+        {% endif %}
         {% if current == "pushsetting" %}
             <a class="list-group-item active" href="/pushsetting">{{_("Push Setting")}}</a>
         {% else %}

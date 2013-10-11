@@ -1,32 +1,4 @@
 {% extends "base-home.html" %}
-{% block css %}
-<style type="text/css">
-#fs_login{
-    background:#F8F8F8;
-    padding:20px;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    border-width: 1px;
-    border-style: solid;
-    border-color: #DDDDDD;
-    margin:15px 0;
-}
-#tips{
-    color:red;
-    font-size:0.8em;
-    text-align:center;
-}
-#login{
-    margin:0px auto;
-}
-#note{
-    color:grey;
-    font-size:0.8em;
-    text-align:center;
-}
-</style>
-{% endblock %}
 {% block bodytag %}
 <body onload="document.getElementById('username').focus();">
 {% endblock %}
@@ -49,11 +21,10 @@
         </tr>
         <tr>
             <td></td>
-            <td><input type="submit" value="    {{_("Login")}}    " onclick="javascript:return check();window.close();" target="_parent" /></td>
+            <td><input type="submit" class="actionButton" value="    {{_("Login")}}    " onclick="javascript:return check();window.close();" target="_parent" /></td>
         </tr>
     </table>
     </form>
     </fieldset>
-    <pre><p> </p></pre>
     <p id="note">{{_("The website dont allow register, you can ask owner for a account.")}}</p>
 {% endblock %}

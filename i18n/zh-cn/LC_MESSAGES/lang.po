@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.6\n"
 "POT-Creation-Date: 2013-08-06 14:16+China Standard Time\n"
-"PO-Revision-Date: 2013-10-11 16:57+0800\n"
+"PO-Revision-Date: 2013-10-11 17:16+0800\n"
 "Last-Translator: Arroz <akindleear@gmail.com>\n"
 "Language-Team: Arroz <akindleear@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -447,3 +447,9 @@ msgstr "日"
 
 msgid "Logs of other users"
 msgstr "其他用户的日志"
+
+msgid "Recommend"
+msgstr "推荐"
+
+msgid "Add Content"
+msgstr "添加订阅"
