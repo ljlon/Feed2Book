@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block menubar %}
+<div class="col-md-3">
+    <div class="list-group">
+        {% if current == "pushsetting" %}
+            <a class="list-group-item active" href="/pushsetting">{{_("Push Setting")}}</a>
+        {% else %}
+            <a class="list-group-item" href="/pushsetting">{{_("Push Setting")}}</a>
+        {% endif %}
+        {% if current == "logs" %}
+            <a class="list-group-item active" href="/logs">{{_("Logs")}}</a>
+        {% else %}
+            <a class="list-group-item" href="/logs">{{_("Logs")}}</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

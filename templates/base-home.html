@@ -1,20 +1,5 @@
 {% extends "base.html" %}
 {% block menubar %}
-{% if nickname %}
-    <h2 id="categoryHeader"> 
-    <a href="/">{{_("All")}}</a>
-    <span style="color: #ccc;">&bull;</span>
-    {% if current == "my" %}
-    {{_("Feeds")}}
-    {% else %}
-    <a href="/my">{{_("Feeds")}}</a>
-    {% endif %}
-    <span style="color: #ccc;">&bull;</span>
-    {% if current == "pushsetting" %}
-    {{_("Push Setting")}}
-    {% else %}
-    <a href="/pushsetting">{{_("Push Setting")}}</a>
-    {% endif %}
-    </h2>
-{% endif %}
+<div>
+</div>
 {% endblock %}

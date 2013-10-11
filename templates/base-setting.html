@@ -1,26 +1,17 @@
 {% extends "base.html" %}
 {% block menubar %}
-{% if nickname %}
-    <h2 id="categoryHeader"> 
-    {% if current == "admin" %}
-    {{_("Admin")}}
-    {% else %}
-    <a href="/admin">{{_("Admin")}}</a>
-    {% endif %}
-    <span style="color: #ccc;">&bull;</span>
-    {% if current == "logs" %}
-    {{_("Logs")}}
-    {% else %}
-    <a href="/logs">{{_("Logs")}}</a>
-    {% endif %}
-    <span style="color: #ccc;">&bull;</span>
-    {% if current == "advsetting" %}
-    {{_("Advance")}}
-    {% else %}
-    <a href="/advsetting">{{_("Advance")}}</a>
-    {% endif %}
-    </h2>
-{% else %}
-    <h2 style="text-align:left;padding:10px 0;"><a href="/login">{{_("Please Login")}}</a></h2>
-{% endif %}
+<div class="col-md-3">
+    <div class="list-group">
+        {% if current == "admin" %}
+            <a class="list-group-item active" href="/admin">{{_("Admin")}}</a>
+        {% else %}
+            <a class="list-group-item" href="/admin">{{_("Admin")}}</a>
+        {% endif %}
+        {% if current == "Advance" %}
+            <a class="list-group-item active" href="/advsetting">{{_("Advance")}}</a>
+        {% else %}
+            <a class="list-group-item" href="/advsetting">{{_("Advance")}}</a>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
