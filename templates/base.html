@@ -39,8 +39,12 @@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if nickname %}
-                        <li><a>Hello,{{nickname}}</a></li>
-                        <li><a href="/admin"><strong>{{_("Setting")}}</strong></a></li>
+                        {% if current == "admin" %}
+                        <li class="active">
+                        {% else %}
+                        <li>
+                        {% endif %}
+                        <a href="/admin"><strong>{{nickname}}</strong></a></li>
                         <li><a href="/logout">{{_("Logout")}}</a></li>
                     {% else %}
                         <li><a href="/login">{{_("Login")}}</a></li>
@@ -52,7 +56,10 @@
     </div>
 
     <div class="container theme-showcase">
+        {% block contentheader %}
+        {% endblock %}
         <div class="row">
+            </div>
             {% block content %}
             {% endblock %}
 

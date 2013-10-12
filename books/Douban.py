@@ -9,7 +9,7 @@ def getBook():
 
 class Douban(BaseFeedBook):
     title                 = u'豆瓣'
-    description           = u'豆瓣最受欢迎的影评、豆瓣最受欢迎的书评'
+    description           = u'豆瓣最受欢迎的影评'
     language              = 'zh-cn'
     feed_encoding         = "utf-8"
     page_encoding         = "utf-8"
@@ -17,6 +17,5 @@ class Douban(BaseFeedBook):
     fetch_img_via_ssl     = False
     feeds = [
             (u'豆瓣最受欢迎的影评', 'http://movie.douban.com/feed/review/movie'),
-            (u'豆瓣最受欢迎的书评', 'http://book.douban.com/feed/review/book'),
            ]
            
