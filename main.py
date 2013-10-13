@@ -210,7 +210,11 @@ class BaseHandler:
 class Home(BaseHandler):
     def GET(self):
         return self.render('home.html',"Home", books=Book.all().filter("builtin = ",True))
-   
+  
+class Explore(BaseHandler):
+    def GET(self):
+        return self.render('explore.html',"Explore", current='explore', books=Book.all().filter("builtin = ",True))
+
 class PushSetting(BaseHandler):
     def GET(self, tips=None):
         user = self.getcurrentuser()
@@ -873,6 +877,7 @@ urls = (
   "/mgrpwd/(.*)", "AdminMgrPwd",
   "/delaccount/(.*)", "DelAccount",
   "/my", "MySubscription",
+  "/explore", "Explore",
   "/subscribe/(.*)", "Subscribe",
   "/unsubscribe/(.*)", "Unsubscribe",
   "/delfeed/(.*)", "DelFeed",

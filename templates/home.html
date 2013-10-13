@@ -1,10 +1,9 @@
 {% extends "base-home.html" %}
 {% block contentheader %}
-<div class="alert alert-success">
-{{_("Push whole RSS feed content to you device, as mobi and epub book.")}}
+<div class="page-header">
+  {{_("Push whole RSS feed content to you device, as mobi and epub book")}}
 </div>
 {% endblock %}
-
 {% block content %}
 <div class="col-md-9">
     {% set hasitem2 = [] %}
