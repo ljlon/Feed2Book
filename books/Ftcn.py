@@ -5,11 +5,11 @@ import re
 from base import BaseFeedBook
 
 def getBook():
-    return Douban
+    return FtCN
 
-class Douban(BaseFeedBook):
-    title                 = u'豆瓣'
-    description           = u'豆瓣最受欢迎的影评'
+class FtCN(BaseFeedBook):
+    title                 = u'FT中文网_英国《金融时报》'
+    description           = u'FT中文网每日新闻'
     category              = 2
     language              = 'zh-cn'
     feed_encoding         = "utf-8"
@@ -17,6 +17,6 @@ class Douban(BaseFeedBook):
     network_timeout       = 30
     fetch_img_via_ssl     = False
     feeds = [
-            (u'豆瓣最受欢迎的影评', 'http://movie.douban.com/feed/review/movie'),
+            (u'FT中文网每日新闻', 'http://www.ftchinese.com/rss/feed'),
            ]
            

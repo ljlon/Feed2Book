@@ -4,6 +4,8 @@
 import os
 
 _booksclasses = []
+_bookcategoryclasses = []
+
 def RegisterBook(book):
     if book.title:
         _booksclasses.append(book)
@@ -30,3 +32,40 @@ def LoadBooks():
                 default_log.warn("Book '%s' import failed : %s" % (bookname,e))
 
 LoadBooks()
+
+def BookCategoryClasses():
+    return _bookcategoryclasses
+
+def BookCategoryClass(id):
+    for category in _bookcategoryclasses:
+        if category.id == id:
+            return category
+    return None
+
+class Default:
+    id                    = 0
+    title                 = u'未分类'
+    description           = u''
+
+class Tech:
+    id                    = 1
+    title                 = u'科技'
+    description           = u''
+
+class News:
+    id                    = 2
+    title                 = u'资讯'
+    description           = u''
+
+class Magazine:
+    id                    = 3
+    title                 = u'杂志'
+    description           = u''
+
+def LoadBookCategors():
+    _bookcategoryclasses.append(Default)
+    _bookcategoryclasses.append(Tech)
+    _bookcategoryclasses.append(News)
+    _bookcategoryclasses.append(Magazine)
+
+LoadBookCategors()

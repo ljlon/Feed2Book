@@ -8,6 +8,7 @@ def getBook():
 class Lifeweek(BaseFeedBook):
     title                 = u'三联生活周刊'
     description           = u'秉承"倡导品质生活"的理念，提供优质新媒体内容与服务。每周六推送'
+    category              = 3
     language              = 'zh-cn'
     feed_encoding         = "utf-8"
     page_encoding         = "utf-8"

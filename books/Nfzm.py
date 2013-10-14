@@ -8,6 +8,7 @@ def getBook():
 class Nanfangzhoumo(BaseFeedBook):
     title                 = u'南方周末'
     description           = u'在这里，读懂中国。 每周五推送'
+    category              = 3
     language              = 'zh-cn'
     feed_encoding         = "utf-8"
     page_encoding         = "utf-8"

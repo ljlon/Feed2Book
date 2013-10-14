@@ -9,6 +9,7 @@ def getBook():
 class Dapenti(BaseFeedBook):
     title                 = u'喷嚏图卦'
     description           = u'每天一图卦，让我们更清楚地了解这个世界'
+    category              = 3
     language              = 'zh-cn'
     feed_encoding         = "utf-8"
     page_encoding         = "utf-8"

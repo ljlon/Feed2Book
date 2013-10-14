@@ -9,6 +9,7 @@ def getBook():
 class BBCChina(BaseFeedBook):
     title                 = u'BBC中文网'
     description           = u'BBC中文网'
+    category              = 2
     language              = 'zh-cn'
     feed_encoding         = "utf-8"
     page_encoding         = "utf-8"

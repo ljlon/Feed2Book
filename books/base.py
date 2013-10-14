@@ -107,6 +107,7 @@ class BaseFeedBook:
     title                 = ''
     __author__            = ''
     description           = ''
+    category              = 0
     max_articles_per_feed = 30
     oldest_article        = 7 #下载多长时间之内的文章，单位为天，0则不限制
     host                  = None # 有些网页的图像下载需要请求头里面包含Referer,使用此参数配置

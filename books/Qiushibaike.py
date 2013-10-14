@@ -12,6 +12,7 @@ def getBook():
 class Qiushibaike(WebpageBook):
     title                 = u'糗事百科'
     description           = u'快乐就是要建立在别人的痛苦之上，额外赠送哈哈.MX'
+    category              = 2
     language = 'zh-cn'
     feed_encoding = "utf-8"
     page_encoding = "utf-8"

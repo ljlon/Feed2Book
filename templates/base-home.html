@@ -2,8 +2,18 @@
 {% block menubar %}
 <div class="col-md-3">
     <div class="list-group">
-        <!-- a class="list-group-item" href="/">{{_("Recommend")}}</a !-->
+        {% if category %}
+        <a class="list-group-item" href="/">{{_("All")}}</a>
+        {% else %}
         <a class="list-group-item active" href="/">{{_("All")}}</a>
+        {% endif %}
+        {% for bookCategory in bookCategories %}
+        {% if category == bookCategory.id %}
+	    <a class="list-group-item active" href="/?category={{bookCategory.id}}">{{bookCategory.title}}</a>
+	    {% else %}
+	    <a class="list-group-item" href="/?category={{bookCategory.id}}">{{bookCategory.title}}</a>
+	    {% endif %}
+	    {% endfor %}
     </div>
 </div>
 {% endblock %}

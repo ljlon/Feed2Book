@@ -29,7 +29,7 @@ from config import *
 
 from lib.makeoeb import *
 from lib.memcachestore import MemcacheStore
-from books import BookClasses, BookClass
+from books import BookClasses, BookClass, BookCategoryClasses, BookCategoryClass
 from books.base import BaseFeedBook, UrlEncoding
 
 #reload(sys)
@@ -50,6 +50,7 @@ def set_lang(lang):
 class Book(db.Model):
     title = db.StringProperty(required=True)
     description = db.StringProperty()
+    category = db.IntegerProperty()
     users = db.StringListProperty()
     builtin = db.BooleanProperty() # 内置书籍不可修改
     #====自定义书籍
@@ -76,7 +77,25 @@ class Book(db.Model):
     @property
     def owner(self):
         return KeUser.all().filter('ownfeeds = ', self.key())
-    
+
+class BookCategory(db.Model):
+    id = db.IntegerProperty()
+    title = db.StringProperty()
+    description = db.StringProperty()
+    @property
+    def books(self):
+        return Book.all().filter('category = ', self.id)
+    @property
+    def bookscount(self):
+        mkey = '%d.bookscount'%self.key().id()
+        mfc = memcache.get(mkey)
+        if mfc is not None:
+            return mfc
+        else:
+            fc = self.books.count()
+            memcache.add(mkey, fc, 86400)
+            return fc
+
 class KeUser(db.Model): # Feed2Book User
     name = db.StringProperty(required=True)
     passwd = db.StringProperty(required=True)
@@ -111,17 +130,22 @@ class UrlFilter(db.Model):
 class WhiteList(db.Model):
     mail = db.StringProperty()
     
-#def StoreBookToDb():
+#StoreBookToDb():
 for book in BookClasses():  #添加内置书籍
     if memcache.get(book.title): #使用memcache加速
         continue
     b = Book.all().filter("title = ", book.title).get()
     if not b:
-        b = Book(title=book.title,description=book.description,builtin=True)
+        b = Book(title=book.title,description=book.description,category=book.category,builtin=True)
         b.put()
         memcache.add(book.title, book.description, 86400)
 
-#StoreBookToDb()
+#StoreBookCategoryToDb():
+for bookCategory in BookCategoryClasses():  #添加内置书籍目录
+    bc = BookCategory.all().filter("id = ", bookCategory.id).get()
+    if not bc:
+        bc = BookCategory(id=bookCategory.id,title=bookCategory.title,description=bookCategory.description)
+        bc.put()
 
 class BaseHandler:
     " URL请求处理类的基类，实现一些共同的工具函数 "
@@ -209,10 +233,15 @@ class BaseHandler:
         
 class Home(BaseHandler):
     def GET(self):
-        return self.render('home.html',"Home", books=Book.all().filter("builtin = ",True))
-  
+        category = web.input().get('category')
+        if not category:
+            return self.render('home.html',"Home", books=Book.all().filter("builtin = ",True), bookCategories=BookCategory.all().filter("id != ",0))
+        else:
+            category = int(category)
+            return self.render('home.html',"Home", books=Book.all().filter("builtin = ",True).filter("category =",category),category=category,bookCategories=BookCategory.all().filter("id != ",0))
+
 class Explore(BaseHandler):
-    def GET(self):
+    def GET(self):    
         return self.render('explore.html',"Explore", current='explore', books=Book.all().filter("builtin = ",True))
 
 class PushSetting(BaseHandler):
