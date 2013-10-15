@@ -88,6 +88,11 @@ class Book(db.Model):
             fc = self.feeds.count()
             memcache.add(mkey, fc, 86400)
             return fc
+    def memfeedscount(self):
+        mkey = '%d.feedscount'%self.key().id()
+        fc = self.feeds.count()
+        memcache.set(mkey, fc, 86400)
+        return fc
     @property
     def subs(self):
         return SubBook.all().filter('book = ', self.key())
@@ -96,6 +101,17 @@ class Book(db.Model):
         mkey = '%d.subscount'%self.key().id()
         mfc = memcache.get(mkey)
         if mfc is not None:
+            return mfc
+        else:
+            fc = self.subs.count()
+            memcache.add(mkey, fc, 86400)
+            return fc
+    def addsubs(self,addnum):
+        mkey = '%d.subscount'%self.key().id()
+        mfc = memcache.get(mkey)
+        if mfc is not None:
+            mfc = mfc + addnum
+            memcache.set(mkey, mfc, 86400)
             return mfc
         else:
             fc = self.subs.count()
@@ -560,13 +576,15 @@ class MyShare(BaseHandler):
         userkey = user.key()
         builtin = False
         bookkey=Book(title=title,description=description,category_id=category,user=userkey,builtin=builtin).put()
+        book = Book.get_by_id(bookkey.id())
 
         if not url.lower().startswith('http'): #http and https
             url = 'http://' + url
-       
         Feed(title=title,url=url,book=bookkey,isfulltext=isfulltext).put()
 
         SubBook(user=userkey,book=bookkey).put()
+
+        book.addsubs(1)
 
         raise web.seeother('/myshare')
 
@@ -589,6 +607,7 @@ class Subscribe(BaseHandler):
         sub = SubBook.all().filter("user = ", user.key()).filter("book = ", bk.key()).get();
         if not sub:
             SubBook(user=user.key(),book=bk.key()).put()
+            bk.addsubs(1)
         raise web.seeother('/my')
     def POST(self, id):
         self.login_required()
@@ -608,6 +627,7 @@ class Subscribe(BaseHandler):
         sub = SubBook.all().filter("user = ", user.key()).filter("book = ", bk.key()).get();
         if not sub:
             SubBook(user=user.key(),book=bk.key()).put()
+            bk.addsubs(1)
         return "ok"
         
 class Unsubscribe(BaseHandler):
@@ -629,6 +649,7 @@ class Unsubscribe(BaseHandler):
         sub = SubBook.all().filter("user = ", user.key()).filter("book = ", bk.key()).get();
         if sub:
             sub.delete()
+            bk.addsubs(-1)
 
         raise web.seeother('/my')
     def POST(self, id):
@@ -649,6 +670,7 @@ class Unsubscribe(BaseHandler):
         sub = SubBook.all().filter("user = ", user.key()).filter("book = ", bk.key()).get();
         if sub:
             sub.delete()
+            bk.addsubs(-1)
         return "ok"
 class DelShare(BaseHandler):
     def GET(self, id):
