@@ -94,7 +94,14 @@ border-bottom: 1px solid #eeeeee
     text-align: right;
     /*padding-top: 3px;*/
 }
-
+.bottomRow{
+    font-size: 9px;
+    position: relative;
+    clear: both;
+    text-align: right;
+    margin-left: 4px;
+    padding-right: 4px;
+}
 .legendCtrl{
     position: absolute;
     width: 70px;

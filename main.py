@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-__Version__ = "1.6.9"
-__Author__ = "Arroz"
+__Version__ = "2.0.0"
+__Author__ = "ljlon"
 
 import os, datetime, logging, __builtin__, hashlib
 from collections import OrderedDict, defaultdict
@@ -86,6 +86,19 @@ class Book(db.Model):
             return mfc
         else:
             fc = self.feeds.count()
+            memcache.add(mkey, fc, 86400)
+            return fc
+    @property
+    def subs(self):
+        return SubBook.all().filter('book = ', self.key())
+    @property
+    def subscount(self):
+        mkey = '%d.subscount'%self.key().id()
+        mfc = memcache.get(mkey)
+        if mfc is not None:
+            return mfc
+        else:
+            fc = self.subs.count()
             memcache.add(mkey, fc, 86400)
             return fc
 
