@@ -47,11 +47,23 @@ def set_lang(lang):
     jjenv.install_gettext_translations(tr)
 
 #--------------db models----------------
+class KeUser(db.Model): # Feed2Book User
+    name = db.StringProperty(required=True)
+    passwd = db.StringProperty(required=True)
+    kindle_email = db.StringProperty()
+    enable_send = db.BooleanProperty()
+    send_days = db.StringListProperty()
+    send_time = db.IntegerProperty()
+    timezone = db.IntegerProperty()
+    book_type = db.StringProperty()
+    expires = db.DateTimeProperty()
+    titlefmt = db.StringProperty() #在元数据标题中添加日期的格式
+
 class Book(db.Model):
     title = db.StringProperty(required=True)
     description = db.StringProperty()
-    category = db.IntegerProperty()
-    users = db.StringListProperty()
+    category_id = db.IntegerProperty()
+    user = db.ReferenceProperty(KeUser)
     builtin = db.BooleanProperty() # 内置书籍不可修改
     #====自定义书籍
     language = db.StringProperty()
@@ -59,7 +71,9 @@ class Book(db.Model):
     coverfile = db.StringProperty()
     keep_image = db.BooleanProperty()
     oldest_article = db.IntegerProperty()
-    
+
+    subscribed = db.BooleanProperty()
+
     #这三个属性只有自定义RSS才有意义
     @property
     def feeds(self):
@@ -78,13 +92,20 @@ class Book(db.Model):
     def owner(self):
         return KeUser.all().filter('ownfeeds = ', self.key())
 
+    def is_subscribed(self, user):
+        sub = SubBook.all().filter('book = ', self.key()).filter('user = ', user).get()
+        if sub:
+            return True
+        else:
+            return False
+
 class BookCategory(db.Model):
     id = db.IntegerProperty()
     title = db.StringProperty()
     description = db.StringProperty()
     @property
     def books(self):
-        return Book.all().filter('category = ', self.id)
+        return Book.all().filter('category_id = ', self.id)
     @property
     def bookscount(self):
         mkey = '%d.bookscount'%self.key().id()
@@ -96,19 +117,10 @@ class BookCategory(db.Model):
             memcache.add(mkey, fc, 86400)
             return fc
 
-class KeUser(db.Model): # Feed2Book User
-    name = db.StringProperty(required=True)
-    passwd = db.StringProperty(required=True)
-    kindle_email = db.StringProperty()
-    enable_send = db.BooleanProperty()
-    send_days = db.StringListProperty()
-    send_time = db.IntegerProperty()
-    timezone = db.IntegerProperty()
-    book_type = db.StringProperty()
-    expires = db.DateTimeProperty()
-    ownfeeds = db.ReferenceProperty(Book) # 每个用户都有自己的自定义RSS
-    titlefmt = db.StringProperty() #在元数据标题中添加日期的格式
-    
+class SubBook(db.Model):
+    user = db.ReferenceProperty(KeUser)
+    book = db.ReferenceProperty(Book)
+
 class Feed(db.Model):
     book = db.ReferenceProperty(Book)
     title = db.StringProperty()
@@ -136,7 +148,7 @@ for book in BookClasses():  #添加内置书籍
         continue
     b = Book.all().filter("title = ", book.title).get()
     if not b:
-        b = Book(title=book.title,description=book.description,category=book.category,builtin=True)
+        b = Book(title=book.title,description=book.description,category_id=book.category,builtin=True)
         b.put()
         memcache.add(book.title, book.description, 86400)
 
@@ -161,14 +173,14 @@ class BaseHandler:
     @classmethod
     def login_required(self, username=None):
         if (session.get('login') != 1) or (username and username != session.get('username')):
-            raise web.seeother(r'/')
+            raise web.seeother(r'/login')
     
     @classmethod
     def getcurrentuser(self):
         self.login_required()
         u = KeUser.all().filter("name = ", session.username).get()
         if not u:
-            raise web.seeother(r'/')
+            raise web.seeother(r'/login')
         return u
         
     def browerlang(self):
@@ -234,21 +246,36 @@ class BaseHandler:
 class Home(BaseHandler):
     def GET(self):
         category = web.input().get('category')
-        if not category:
-            return self.render('home.html',"Home", books=Book.all().filter("builtin = ",True), bookCategories=BookCategory.all().filter("id != ",0))
-        else:
-            category = int(category)
-            return self.render('home.html',"Home", books=Book.all().filter("builtin = ",True).filter("category =",category),category=category,bookCategories=BookCategory.all().filter("id != ",0))
 
-class Explore(BaseHandler):
-    def GET(self):    
-        return self.render('explore.html',"Explore", current='explore', books=Book.all().filter("builtin = ",True))
+        if not category:
+            books = Book.all()
+            _books = []
+            for book in books:
+                if self.logined() == True:
+                    user = self.getcurrentuser()
+                    if user:
+                        book.subscribed = book.is_subscribed(user.key())
+                _books.append(book)
+            return self.render('home.html',"Home", books=_books, bookCategories=BookCategory.all().filter("id != ",0))
+        else:
+            try:
+                category = int(category)
+            except:
+                return "the category id is invalid!<br />"
+            books = Book.all().filter("category_id =",category)
+            _books = []
+            for book in books:
+                if self.logined() == True:
+                    user = self.getcurrentuser()
+                    if user:
+                        book.subscribed = book.is_subscribed(user.key())
+                _books.append(book)
+            return self.render('home.html',"Home", books=_books,category=category,bookCategories=BookCategory.all().filter("id != ",0))
 
 class PushSetting(BaseHandler):
-    def GET(self, tips=None):
+    def GET(self):
         user = self.getcurrentuser()
-        return self.render('pushsetting.html',"Push Setting",
-            current='pushsetting',user=user,mail_sender=SRC_EMAIL,tips=tips)
+        return self.render('pushsetting.html',"Push Setting",current='pushsetting',user=user,mail_sender=SRC_EMAIL)
         
     def POST(self):
         user = self.getcurrentuser()
@@ -268,14 +295,7 @@ class PushSetting(BaseHandler):
             alldays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
             user.send_days = [day for day in alldays if web.input().get(day)]
             user.put()
-            
-            myfeeds = user.ownfeeds
-            myfeeds.language = web.input().get("lng")
-            myfeeds.title = mytitle
-            myfeeds.keep_image = bool(web.input().get("keepimage"))
-            myfeeds.oldest_article = int(web.input().get('oldest', 7))
-            myfeeds.users = [user.name] if web.input().get("enablerss") else []
-            myfeeds.put()
+    
             tips = _("Push Settings Saved!")
         
         return self.GET(tips)
@@ -356,11 +376,8 @@ class Admin(BaseHandler):
                 except:
                     tips = _("The password includes non-ascii chars!")
                 else:
-                    myfeeds = Book(title=MY_FEEDS_TITLE,description=MY_FEEDS_DESC,
-                        builtin=False,keep_image=True,oldest_article=7)
-                    myfeeds.put()
                     au = KeUser(name=u,passwd=pwd,kindle_email='',enable_send=False,
-                        send_time=7,timezone=TIMEZONE,book_type="mobi",ownfeeds=myfeeds)
+                        send_time=7,timezone=TIMEZONE,book_type="mobi")
                     au.expires = datetime.datetime.utcnow()+datetime.timedelta(days=180)
                     au.put()
                     users = KeUser.all() if user.name == 'admin' else None
@@ -377,12 +394,9 @@ class Login(BaseHandler):
         tips = ''
         u = KeUser.all().filter("name = ", 'admin').get()
         if not u:
-            myfeeds = Book(title=MY_FEEDS_TITLE,description=MY_FEEDS_DESC,
-                    builtin=False,keep_image=True,oldest_article=7)
-            myfeeds.put()
             au = KeUser(name='admin',passwd=hashlib.md5('admin').hexdigest(),
                 kindle_email='',enable_send=False,send_time=8,timezone=TIMEZONE,
-                book_type="mobi",expires=None,ownfeeds=myfeeds)
+                book_type="mobi",expires=None)
             au.put()
             tips = _("Please use admin/admin to login at first time.")
         else:
@@ -482,13 +496,9 @@ class DelAccount(BaseHandler):
             if not u:
                 tips = _("The username '%s' not exist!") % name
             else:
-                if u.ownfeeds:
-                    for feed in u.ownfeeds.feeds:
-                        feed.delete()
-                    u.ownfeeds.delete()
                 u.delete()
                 
-                # 删掉订阅记录
+                # 删掉共享记录
                 for book in Book.all():
                     if book.users and name in book.users:
                         book.users.remove(name)
@@ -507,59 +517,88 @@ class MySubscription(BaseHandler):
     # 管理我的订阅和杂志列表
     def GET(self, tips=None):
         user = self.getcurrentuser()
-        myfeeds = user.ownfeeds.feeds if user.ownfeeds else None
+        mysubs = SubBook.all().filter("user = ", user.key())
+        books = []
+        for mysub in mysubs:
+            books.append(mysub.book)
         return self.render('my.html', "My subscription",current='my',
-            books=Book.all().filter("builtin = ",True),myfeeds=myfeeds,tips=tips)
+            books=books,tips=tips)
+ 
+class MyShare(BaseHandler):
+    # 管理我的订阅和杂志列表
+    def GET(self, tips=None):
+        user = self.getcurrentuser()
+        books = Book.all().filter("user = ",user.key())
+        _books = []
+        for book in books:
+            book.subscribed = book.is_subscribed(user.key())
+            _books.append(book)
+        return self.render('myshare.html',"My share",current='myshare',
+            books=_books,bookCategories=BookCategory.all(),tips=tips)
     
     def POST(self): # 添加自定义RSS
         user = self.getcurrentuser()
         title = web.input().get('t')
+        description = web.input().get('des')
         url = web.input().get('url')
         isfulltext = bool(web.input().get('fulltext'))
         if not title or not url:
             return self.GET(_("Title or url is empty!"))
-        
+
+        try:
+            category = int(web.input().get('category'))
+        except Exception, e:
+            return self.GET(_("Category id is invalid!"))
+
+        userkey = user.key()
+        builtin = False
+        bookkey=Book(title=title,description=description,category_id=category,user=userkey,builtin=builtin).put()
+
         if not url.lower().startswith('http'): #http and https
             url = 'http://' + url
-        assert user.ownfeeds
-        Feed(title=title,url=url,book=user.ownfeeds,isfulltext=isfulltext).put()
-        memcache.delete('%d.feedscount'%user.ownfeeds.key().id())
-        raise web.seeother('/my')
-        
+       
+        Feed(title=title,url=url,book=bookkey,isfulltext=isfulltext).put()
+
+        raise web.seeother('/myshare')
+
 class Subscribe(BaseHandler):
     def GET(self, id):
         self.login_required()
         if not id:
             return "the id is empty!<br />"
         try:
-            id = int(id)
-        except:
+            intid = int(id)
+        except Exception, e:
             return "the id is invalid!<br />"
-        
-        bk = Book.get_by_id(id)
+
+        bk = Book.get_by_id(intid)
         if not bk:
-            return "the book(%d) not exist!<br />" % id
+            return "the book(%d) not exist!<br />" % intid
         
-        if session.username not in bk.users:
-            bk.users.append(session.username)
-            bk.put()
+        user = self.getcurrentuser()
+
+        sub = SubBook.all().filter("user = ", user.key()).filter("book = ", bk.key()).get();
+        if not sub:
+            SubBook(user=user.key(),book=bk.key()).put()
         raise web.seeother('/my')
     def POST(self, id):
         self.login_required()
         if not id:
             return "the id is empty!<br />"
         try:
-            id = int(id)
-        except:
+            intid = int(id)
+        except Exception, e:
             return "the id is invalid!<br />"
         
-        bk = Book.get_by_id(id)
+        bk = Book.get_by_id(intid)
         if not bk:
-            return "the book(%d) not exist!<br />" % id
+            return "the book(%d) not exist!<br />" % intid
         
-        if session.username not in bk.users:
-            bk.users.append(session.username)
-            bk.put()
+        user = self.getcurrentuser()
+
+        sub = SubBook.all().filter("user = ", user.key()).filter("book = ", bk.key()).get();
+        if not sub:
+            SubBook(user=user.key(),book=bk.key()).put()
         return "ok"
         
 class Unsubscribe(BaseHandler):
@@ -568,36 +607,41 @@ class Unsubscribe(BaseHandler):
         if not id:
             return "the id is empty!<br />"
         try:
-            id = int(id)
+            intid = int(id)
         except:
             return "the id is invalid!<br />"
             
-        bk = Book.get_by_id(id)
+        bk = Book.get_by_id(intid)
         if not bk:
             return "the book(%d) not exist!<br />" % id
         
-        if session.username in bk.users:
-            bk.users.remove(session.username)
-            bk.put()
+        user = self.getcurrentuser()
+
+        sub = SubBook.all().filter("user = ", user.key()).filter("book = ", bk.key()).get();
+        if sub:
+            sub.delete()
+
         raise web.seeother('/my')
     def POST(self, id):
         self.login_required()
         if not id:
             return "the id is empty!<br />"
         try:
-            id = int(id)
+            initid = int(id)
         except:
             return "the id is invalid!<br />"
             
-        bk = Book.get_by_id(id)
+        bk = Book.get_by_id(initid)
         if not bk:
             return "the book(%d) not exist!<br />" % id
         
-        if session.username in bk.users:
-            bk.users.remove(session.username)
-            bk.put()
+        user = self.getcurrentuser()
+
+        sub = SubBook.all().filter("user = ", user.key()).filter("book = ", bk.key()).get();
+        if sub:
+            sub.delete()
         return "ok"
-class DelFeed(BaseHandler):
+class DelShare(BaseHandler):
     def GET(self, id):
         user = self.getcurrentuser()
         if not id:
@@ -606,12 +650,38 @@ class DelFeed(BaseHandler):
             id = int(id)
         except:
             return "the id is invalid!<br />"
+
+        book = Book.get_by_id(id)
+
+        if book and book.user.key() == user.key():
+            feeds = Feed.all().filter("book = ", book.key()).get()
+            if feeds:
+                feeds.delete()
+            subBooks = SubBook.all().filter("book = ", book.key()).get()
+            if subBooks:
+                subBooks.delete();
+            book.delete()
         
-        feed = Feed.get_by_id(id)
-        if feed:
-            feed.delete()
+        raise web.seeother('/myshare')
+    def POST(self, id):
+        self.login_required()
+        if not id:
+            return "the id is empty!<br />"
+        try:
+            id = int(id)
+        except:
+            return "the id is invalid!<br />"
         
-        raise web.seeother('/my')
+        book = Book.get_by_id(id)
+        if book and book.user.key() == user.key():
+            feeds = Feed.all().filter("book = ", book.key()).get()
+            if feeds:
+                feeds.delete()
+            subBooks = SubBook.all().filter("book = ", book.key()).get()
+            if subBooks:
+                subBooks.delete();
+            book.delete()
+        return "ok"
                 
 class Deliver(BaseHandler):
     """ 判断需要推送哪些书籍 """
@@ -906,10 +976,10 @@ urls = (
   "/mgrpwd/(.*)", "AdminMgrPwd",
   "/delaccount/(.*)", "DelAccount",
   "/my", "MySubscription",
-  "/explore", "Explore",
   "/subscribe/(.*)", "Subscribe",
   "/unsubscribe/(.*)", "Unsubscribe",
-  "/delfeed/(.*)", "DelFeed",
+  "/myshare", "MyShare",
+  "/delshare/(.*)", "DelShare",
   "/pushsetting", "PushSetting",
   '/advsetting', 'AdvSetting',
   "/admin","Admin",

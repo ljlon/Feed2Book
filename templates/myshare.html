@@ -1,0 +1,119 @@
+{% extends "base-my.html" %}
+{% block content %}
+<div class="col-md-9">
+    <fieldset id="ownfeeds">
+        <legend>{{_("Share")}}</legend>
+        <form class="navbar-form" action="" method="POST">
+        <div>
+            <div>
+                <input class="span2" type="text" name="t" placeholder={{_("Title")}} />
+                <span>
+                    <select name="category">
+                    {% set selected = False %}
+                    {% for category in bookCategories %}
+                    <option value={{category.id}} {% if selected==False %}selected="selected"{% set selected=True %}{% endif %}>{{category.title}}</option>
+                    {% endfor %}
+                    </select>
+                </span>
+                <span><input type="checkbox" name="fulltext"/></td><td><img alt="{{_("Fulltext")}}" src="static/fulltext.gif" border="0" /></span>
+                <span class="right"><input type="submit" value="{{_("Add")}}" class="actionButton" /></span>
+            </div>
+            <input class="row" type="text" name="des" style="width:100%;" placeholder={{_("Description")}} />
+            <input class="row" type="text" name="url" style="width:100%;" placeholder="URL" />
+            {% if tips %}<p style="color:red;font-size:0.7em;">{{tips}}</p>{% endif %}
+        </div>
+        </form>
+    </fieldset>
+    <p></p>
+    <fieldset id="mybooks">
+        <legend>{{_("My Share")}}</legend>
+        {% set hasitem = [] %}
+        {% for book in books %}
+        <div class="book">
+            <div class="titleRow">{{book.title}}</div>
+            <div class="cornerControls">
+                <a href="/delshare/{{book.key().id()}}" class="actionButton">{{_("Delete")}}</a>
+                {% if book.subscribed != True %}
+                <a href="/subscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribe")}}</a>
+                {% else %}
+                <a href="/unsubscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribed")}}</a>
+                {% endif %}
+            </div>
+            <div class="summaryRow">
+                {%if book.description|length>80%}{{book.description[:80]}}...<span>{{book.description}}</span>{%else%}{{book.description}}{%endif%}
+            </div>
+        </div>
+        {% do hasitem.append(1) %}
+        {% endfor %}
+        {% if not hasitem %}
+        <p style="font-size:0.8em;color:grey;">{{_("No share was found")}}</p>
+        {% endif %}
+    </fieldset>
+</div>
+<script type="text/javascript">
+        function ajax_request(obj, msg, callback)
+        {
+            var href = $(obj).attr('href');
+            if (href == '' || href =='#')
+                return false
+            $(obj).attr('href', '###');
+            $.post(href, {},
+                function(data){
+                    if(data == 'ok') {
+                        if (callback){
+                            callback(obj)
+                        }
+                        else if (msg){
+                            alert(msg);
+                        }
+                        return false;
+                    }
+                }
+            );
+            return false;
+        }
+        $(document).ready(function(){
+            $(".actionButton").click(function(){
+                if ($(this).hasClass("needLogin")){
+                    alert("{{_("Please Login")}}");
+                    return false;
+                }
+
+                var obj = $(this);
+                var href = $(this).attr('href');
+                var url_parsed=new Array(); 
+                url_parsed=href.split("/");
+                var action = url_parsed[1];
+                var id = url_parsed[2];
+
+                if (action == "unsubscribe") {                
+                    ajax_request($(this), null, function(obj){
+                        $(obj).html("{{_("Subscribe")}}");
+                        href = '/subscribe/' + id;
+                        $(obj).attr('href', href);
+                    });
+                    return false;
+                }
+                else if (action == "subscribe"){
+                     ajax_request($(this), null, function(obj){
+                        $(obj).html("{{_("Subscribed")}}");
+                        href = '/unsubscribe/' + id;
+                        $(obj).attr('href', href);
+                    });
+                    return false;
+                }
+                else if (action == "delshare"){
+                    var ret= window.confirm("{{_("Are you sure to delete this share")}}?");
+                    if (ret) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+        });
+    </script>
+{% endblock %}

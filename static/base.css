@@ -3,6 +3,14 @@ body {
   padding-bottom: 30px;
 }
 
+.right {
+    float:right;
+}
+
+form .row {
+    margin: 2px 0;
+}
+
 .page-header {
 padding-bottom: 9px;
 margin: 0px 0 20px;

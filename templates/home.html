@@ -13,7 +13,7 @@
         <div class="cornerControls">
             {% if not nickname %}
             <a href="#" class="needLogin actionButton">{{_("Subscribe")}}</a>
-            {% elif nickname not in book.users %}
+            {% elif book.subscribed != True %}
             <a href="/subscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribe")}}</a>
             {% else %}
             <a href="/unsubscribe/{{book.key().id()}}" class="actionButton">{{_("Subscribed")}}</a>
@@ -71,12 +71,15 @@
                             $(obj).attr('href', href);
                         });
                     }
-                    else {
-                         ajax_request($(this), null, function(obj){
+                    else if (action == "subscribe"){
+                        ajax_request($(this), null, function(obj){
                             $(obj).html("{{_("Subscribed")}}");
                             href = '/unsubscribe/' + id;
                             $(obj).attr('href', href);
                         });
+                    }
+                    else{
+                        return true;
                     }
 
                     return false;

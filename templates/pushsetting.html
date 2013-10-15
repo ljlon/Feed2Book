@@ -73,48 +73,6 @@
                 <strong id="testmsg" class="error"></strong> {{_("Note: task deliver will be executed after some minutes.")}}
             </p>        
         </fieldset>
-        <p></p>
-        <fieldset id="adv_fieldset">
-            <legend>{{_("Custom Rss Setting")}}</legend>
-            <table border="0">
-                <tr><td style="text-align:right;"><label><em class="required">*</em>{{_("Title")}} : </label></td>
-            <td><input type="text" name="rt" style="width:240px" value="{% if user and user.ownfeeds %}{{ user.ownfeeds.title }}{% endif %}" /></td></tr>
-                <tr><td style="text-align:right;"><label>{{_("Language")}} : </label></td>
-                <td><select class="bool" name="lng">
-                    <option value="zh-cn" {% if not user.ownfeeds.language or user.ownfeeds.language=="zh-cn" %}selected="selected"{% endif %}>{{_("Chinese")}}</option>
-                    <option value="en-us" {% if user.ownfeeds.language=="en-us" %}selected="selected"{% endif %}>{{_("English")}}</option>
-                    <option value="fr-fr" {% if user.ownfeeds.language=="fr-fr" %}selected="selected"{% endif %}>{{_("French")}}</option>
-                    <option value="es-es" {% if user.ownfeeds.language=="es-es" %}selected="selected"{% endif %}>{{_("Spanish")}}</option>
-                    <option value="pt-br" {% if user.ownfeeds.language=="pt-br" %}selected="selected"{% endif %}>{{_("Portuguese")}}</option>
-                    <option value="de-de" {% if user.ownfeeds.language=="de-de" %}selected="selected"{% endif %}>{{_("German")}}</option>
-                    <option value="it-it" {% if user.ownfeeds.language=="it-it" %}selected="selected"{% endif %}>{{_("Italian")}}</option>
-                    <option value="ja-jp" {% if user.ownfeeds.language=="ja-jp" %}selected="selected"{% endif %}>{{_("Japanese")}}</option>
-                    <option value="ru-ru" {% if user.ownfeeds.language=="ru-ru" %}selected="selected"{% endif %}>{{_("Russian")}}</option>
-                    <option value="tr-tr" {% if user.ownfeeds.language=="tr-tr" %}selected="selected"{% endif %}>{{_("Turkish")}}</option>
-                </select></td></tr>
-                <tr><td style="text-align:right;"><label>{{_("Oldest article")}}</label> : </td>
-                <td><select class="bool" name="oldest">
-                    <option value="0" {% if not user.ownfeeds.oldest_article %}selected="selected"{% endif %}>{{_("No limit")}}</option>
-                    <option value="1" {% if user.ownfeeds.oldest_article==1 %}selected="selected"{% endif %}>{{_("1 Day")}}</option>
-                    <option value="2" {% if user.ownfeeds.oldest_article==2 %}selected="selected"{% endif %}>{{_("2 Days")}}</option>
-                    <option value="3" {% if user.ownfeeds.oldest_article==3 %}selected="selected"{% endif %}>{{_("3 Days")}}</option>
-                    <option value="4" {% if user.ownfeeds.oldest_article==4 %}selected="selected"{% endif %}>{{_("4 Days")}}</option>
-                    <option value="5" {% if user.ownfeeds.oldest_article==5 %}selected="selected"{% endif %}>{{_("5 Days")}}</option>
-                    <option value="6" {% if user.ownfeeds.oldest_article==6 %}selected="selected"{% endif %}>{{_("6 Days")}}</option>
-                    <option value="7" {% if user.ownfeeds.oldest_article>=7 %}selected="selected"{% endif %}>{{_("7 Days")}}</option>
-                </select></td></tr>
-            </table>
-            <br />
-            <p>
-                <input type="checkbox" name="keepimage" {% if user and user.ownfeeds.keep_image %}checked="1"{% endif %} />
-                {{_("Keep images")}}</label>
-            </p>
-            <p>
-                <input type="checkbox" name="enablerss" {% if user and nickname in user.ownfeeds.users %}checked="1"{% endif %} />
-                {{_("Enable deliver custom rss")}}</label>
-                <p class="extraInfo">{{_("This switch only effective when 'Enable deliver' is enabled.")}}</P>
-            </p>
-        </fieldset>
         <p class="save_btn">
             <input type="submit" class="actionButton" value="  {{_("Save settings")}}  " />
         </p>
