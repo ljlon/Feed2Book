@@ -88,9 +88,6 @@ class Book(db.Model):
             fc = self.feeds.count()
             memcache.add(mkey, fc, 86400)
             return fc
-    @property
-    def owner(self):
-        return KeUser.all().filter('ownfeeds = ', self.key())
 
     def is_subscribed(self, user):
         sub = SubBook.all().filter('book = ', self.key()).filter('user = ', user).get()
@@ -559,6 +556,8 @@ class MyShare(BaseHandler):
        
         Feed(title=title,url=url,book=bookkey,isfulltext=isfulltext).put()
 
+        SubBook(user=userkey,book=bookkey).put()
+
         raise web.seeother('/myshare')
 
 class Subscribe(BaseHandler):
@@ -875,7 +874,7 @@ class Worker(BaseHandler):
 class Mylogs(BaseHandler):
     def GET(self):
         user = self.getcurrentuser()
-        mylogs = DeliverLog.all().filter("username = ", user.name).order('-time').fetch(limit=10)
+        mylogs = DeliverLog.all().filter("username = ", user.name).order('-time').fetch(limit=20)
         logs = {}
         if user.name == 'admin':
             for u in KeUser.all().filter("name != ", 'admin'):
