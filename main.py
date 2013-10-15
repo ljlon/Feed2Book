@@ -690,29 +690,34 @@ class Deliver(BaseHandler):
     
     def GET(self):
         username = web.input().get('u')
-        id = web.input().get('id') #for debug
-        books = Book.all()
-        if username: #现在投递，不判断时间和星期
-            sent = []
-            books2push = Book.get_by_id(int(id)) if id and id.isdigit() else None
-            books2push = [books2push] if books2push else books
-            for book in books2push:
-                if not id and username not in book.users:
-                    continue
-                user = KeUser.all().filter("name = ", username).get()
-                if user and user.kindle_email:
+        user = self.getcurrentuser()
+        SubBooks = SubBook.all().filter("user = ", user.key())
+        if username and user.name == username: #现在投递，不判断时间和星期
+            if user.kindle_email:
+                sent = []
+                for subBook in SubBooks:
+                    book = subBook.book;
+                    if not book:
+                        continue
                     self.queueit(user, book.key().id())
                     sent.append(book.title)
-            if len(sent):
-                tips = _("Book(s) (%s) put to queue!") % u', '.join(sent)
-            else:
-                tips = _("No book(s) to deliver!")
-            return self.render('autoback.html', "Delivering",tips=tips)
+                if len(sent):
+                    tips = _("Book(s) (%s) put to queue!") % u', '.join(sent)
+                else:
+                    tips = _("No book(s) to deliver!")
+                return self.render('autoback.html', "Delivering",tips=tips)
         
         #定时cron调用
         sentcnt = 0
-        for book in books:
-            if not book.users: #没有用户订阅此书
+        SubBooks = SubBook.all()
+
+        for subBook in SubBooks:
+            book = subBook.book;
+            if not book:
+                continue
+
+            user = subBook.user
+            if not user or not user.kindle_email:
                 continue
             
             bkcls = None
@@ -720,41 +725,36 @@ class Deliver(BaseHandler):
                 bkcls = BookClass(book.title)
                 if not bkcls:
                     continue
+                    
+            #先判断当天是否需要推送
+            day = local_time('%A', user.timezone)
+            usrdays = user.send_days
+
+            if bkcls and bkcls.deliver_days: #按星期推送
+                days = bkcls.deliver_days
+                if not isinstance(days, list):
+                    days = [days]
+                if day not in days:
+                    continue
+            elif usrdays and day not in usrdays: #为空也表示每日推送
+                continue
             
-            #确定此书是否需要下载
-            for u in book.users:
-                user = KeUser.all().filter("enable_send = ",True).filter("name = ", u).get()
-                if not user or not user.kindle_email:
+            #时间判断
+            h = int(local_time("%H", user.timezone)) + 1
+            if h >= 24:
+                h -= 24
+            if bkcls and bkcls.deliver_times:
+                times = bkcls.deliver_times
+                if not isinstance(times, list):
+                    times = [times]
+                if h not in times:
                     continue
-                    
-                #先判断当天是否需要推送
-                day = local_time('%A', user.timezone)
-                usrdays = user.send_days
-                if bkcls and bkcls.deliver_days: #按星期推送
-                    days = bkcls.deliver_days
-                    if not isinstance(days, list):
-                        days = [days]
-                    if day not in days:
-                        continue
-                elif usrdays and day not in usrdays: #为空也表示每日推送
-                    continue
-                    
-                #时间判断
-                h = int(local_time("%H", user.timezone)) + 1
-                if h >= 24:
-                    h -= 24
-                if bkcls and bkcls.deliver_times:
-                    times = bkcls.deliver_times
-                    if not isinstance(times, list):
-                        times = [times]
-                    if h not in times:
-                        continue
-                elif user.send_time != h:
-                    continue
-                
-                #到了这里才是需要推送的
-                self.queueit(user, book.key().id())
-                sentcnt += 1
+            elif user.send_time != h:
+                continue
+           
+            #到了这里才是需要推送的
+            self.queueit(user, book.key().id())
+            sentcnt += 1
         return "Put <strong>%d</strong> books to queue!" % sentcnt
         
 class Worker(BaseHandler):
