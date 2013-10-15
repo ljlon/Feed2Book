@@ -270,18 +270,15 @@ class Home(BaseHandler):
             return self.render('home.html',"Home", books=_books,category=category,bookCategories=BookCategory.all().filter("id != ",0))
 
 class PushSetting(BaseHandler):
-    def GET(self):
+    def GET(self, tips=None):
         user = self.getcurrentuser()
-        return self.render('pushsetting.html',"Push Setting",current='pushsetting',user=user,mail_sender=SRC_EMAIL)
+        return self.render('pushsetting.html',"Push Setting",current='pushsetting',user=user,mail_sender=SRC_EMAIL,tips=tips)
         
     def POST(self):
         user = self.getcurrentuser()
         kemail = web.input().get('kindleemail')
-        mytitle = web.input().get("rt")
         if not kemail:
             tips = _("Kindle E-mail is requied!")
-        elif not mytitle:
-            tips = _("Title is requied!")
         else:
             user.kindle_email = kemail
             user.timezone = int(web.input().get('timezone', TIMEZONE))
@@ -293,7 +290,7 @@ class PushSetting(BaseHandler):
             user.send_days = [day for day in alldays if web.input().get(day)]
             user.put()
     
-            tips = _("Push Settings Saved!")
+            tips = _("Settings Saved!")
         
         return self.GET(tips)
 
