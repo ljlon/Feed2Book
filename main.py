@@ -111,10 +111,15 @@ class Book(db.Model):
         mfc = memcache.get(mkey)
         if mfc is not None:
             mfc = mfc + addnum
+            if mfc < 0:
+                mfc = 0
             memcache.set(mkey, mfc, 86400)
             return mfc
         else:
             fc = self.subs.count()
+            fc = fc + addnum
+            if fc < 0:
+                fc = 0
             memcache.add(mkey, fc, 86400)
             return fc
 
@@ -519,14 +524,25 @@ class DelAccount(BaseHandler):
             if not u:
                 tips = _("The username '%s' not exist!") % name
             else:
+                # 删掉订阅
+                subBooks = SubBook.all().filter("user = ", u.key())
+                for subBook in subBooks:
+                    subBook.book.addsubs(-1)
+                    subBook.delete()
+
+                # 删掉分享
+                books = Book.all().filter("user = ", u.key())
+                for book in books:
+                    feeds = Feed.all().filter("book = ", book.key()).get()
+                    if feeds:
+                        feeds.delete()
+                    subBooks = SubBook.all().filter("book = ", book.key()).get()
+                    if subBooks:
+                        subBooks.delete()
+                    book.delete()
+
                 u.delete()
-                
-                # 删掉共享记录
-                for book in Book.all():
-                    if book.users and name in book.users:
-                        book.users.remove(name)
-                        book.put()
-                
+
                 if session.username == name:
                     raise web.seeother('/logout')
                 else:
@@ -697,16 +713,15 @@ class DelShare(BaseHandler):
             return "the id is invalid!<br />"
 
         book = Book.get_by_id(id)
-
         if book and book.user.key() == user.key():
             feeds = Feed.all().filter("book = ", book.key()).get()
             if feeds:
                 feeds.delete()
             subBooks = SubBook.all().filter("book = ", book.key()).get()
             if subBooks:
-                subBooks.delete();
+                subBooks.delete()
             book.delete()
-        
+    
         raise web.seeother('/myshare')
     def POST(self, id):
         self.login_required()
@@ -726,6 +741,7 @@ class DelShare(BaseHandler):
             if subBooks:
                 subBooks.delete();
             book.delete()
+
         return "ok"
                 
 class Deliver(BaseHandler):
