@@ -609,6 +609,7 @@ class Subscribe(BaseHandler):
             SubBook(user=user.key(),book=bk.key()).put()
             bk.addsubs(1)
         raise web.seeother('/my')
+
     def POST(self, id):
         self.login_required()
         if not id:
@@ -627,8 +628,14 @@ class Subscribe(BaseHandler):
         sub = SubBook.all().filter("user = ", user.key()).filter("book = ", bk.key()).get();
         if not sub:
             SubBook(user=user.key(),book=bk.key()).put()
-            bk.addsubs(1)
-        return "ok"
+            subscount = bk.addsubs(1)
+        else:
+            subscount = bk.subscount()
+
+        data = "{\"errcode\":\"ok\",\"subscount\":\""
+        data += str(subscount)
+        data += "\"}"
+        return data
         
 class Unsubscribe(BaseHandler):
     def GET(self, id):
@@ -670,8 +677,15 @@ class Unsubscribe(BaseHandler):
         sub = SubBook.all().filter("user = ", user.key()).filter("book = ", bk.key()).get();
         if sub:
             sub.delete()
-            bk.addsubs(-1)
-        return "ok"
+            subscount = bk.addsubs(-1)
+        else:
+            subscount = bk.subscount()
+       
+        data = "{\"errcode\":\"ok\",\"subscount\":\""
+        data += str(subscount)
+        data += "\"}"
+        return data
+
 class DelShare(BaseHandler):
     def GET(self, id):
         user = self.getcurrentuser()
