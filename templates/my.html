@@ -17,6 +17,10 @@
             <div class="summaryRow">
                 {%if book.description|length>80%}{{book.description[:80]}}...<span>{{book.description}}</span>{%else%}{{book.description}}{%endif%}
             </div>
+            <div class="bottomRow">
+                <span>{{_("Subscribed")}} </span>
+                <span class="subscount" >{{book.subscount}}</span>
+            </div>
         </div>
         {% do hasitem.append(1) %}
         {% endfor %}
