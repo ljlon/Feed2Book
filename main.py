@@ -755,22 +755,24 @@ class Deliver(BaseHandler):
     
     def GET(self):
         username = web.input().get('u')
-        user = self.getcurrentuser()
-        SubBooks = SubBook.all().filter("user = ", user.key())
-        if username and user.name == username: #现在投递，不判断时间和星期
-            if user.kindle_email:
-                sent = []
-                for subBook in SubBooks:
-                    book = subBook.book;
-                    if not book:
-                        continue
-                    self.queueit(user, book.key().id())
-                    sent.append(book.title)
-                if len(sent):
-                    tips = _("Book(s) (%s) put to queue!") % u', '.join(sent)
-                else:
-                    tips = _("No book(s) to deliver!")
-                return self.render('autoback.html', "Delivering",tips=tips)
+        
+        if username: #现在投递，不判断时间和星期
+            user = self.getcurrentuser()
+            if user.name == username:
+                SubBooks = SubBook.all().filter("user = ", user.key())
+                if user.kindle_email:
+                    sent = []
+                    for subBook in SubBooks:
+                        book = subBook.book;
+                        if not book:
+                            continue
+                        self.queueit(user, book.key().id())
+                        sent.append(book.title)
+                    if len(sent):
+                        tips = _("Book(s) (%s) put to queue!") % u', '.join(sent)
+                    else:
+                        tips = _("No book(s) to deliver!")
+                    return self.render('autoback.html', "Delivering",tips=tips)
         
         #定时cron调用
         sentcnt = 0
