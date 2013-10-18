@@ -591,7 +591,10 @@ class MyShare(BaseHandler):
 
         userkey = user.key()
         builtin = False
-        bookkey=Book(title=title,description=description,category_id=category,user=userkey,builtin=builtin).put()
+        keep_image = True
+        oldest_article = 7
+        language = 'zh-cn'
+        bookkey=Book(title=title,description=description,category_id=category,user=userkey,keep_image=keep_image,language=language,oldest_article=oldest_article,builtin=builtin).put()
         book = Book.get_by_id(bookkey.id())
 
         if not url.lower().startswith('http'): #http and https
